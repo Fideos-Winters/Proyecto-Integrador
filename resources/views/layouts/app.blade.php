@@ -194,43 +194,34 @@
 
                 {{-- Avatar + dropdown --}}
                 <div class="relative">
-<button type="button"
-    data-dropdown-toggle="dropdown-user"
-    class="flex items-center gap-2 rounded-full focus:outline-none transition-all hover:opacity-90"
-    aria-expanded="false"
-    aria-haspopup="true">
+                    <button type="button"
+                        data-dropdown-toggle="dropdown-user"
+                        class="flex items-center gap-2 rounded-full focus:outline-none"
+                        aria-expanded="false"
+                        aria-haspopup="true">
+                        @php
+    // No confíes solo en la sesión, busca al psicólogo actual por su ID
+    $psicologaAutenticada = \App\Models\Psicologo::find(session('id_psicologa'));
     
-    {{-- Contenedor de Imagen o Iniciales --}}
-    <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center overflow-hidden shrink-0"
-         style="border-color: var(--morado-claro); background-color: #2e2e2c;">
-        
-        @if(!empty($fotoPerfil) && $fotoPerfil !== asset('assets/iconos/perfil_psicologa.jpg'))
-            {{-- Si hay una foto real (que no sea la genérica), la mostramos --}}
-            <img class="w-full h-full object-cover" 
-                 src="{{ $fotoPerfil }}" 
-                 alt="Foto de perfil">
-        @else
-            {{-- Respaldo místico: Iniciales si no hay foto --}}
-            <span class="text-white text-[10px] font-bold uppercase">
-                @php
-                    $nombreUser = session('usuario') ?? 'P';
-                    $iniciales = strtoupper(substr($nombreUser, 0, 1) . substr($nombreUser, 1, 1));
-                @endphp
-                {{ $iniciales }}
-            </span>
-        @endif
-    </div>
+    // Usamos el Accessor que forjamos o construimos la ruta manualmente
+    // Si el registro tiene 'JFyu3iFAsg7zHYsQbn8351hccSFNwZvMYGeukJ9F.jpg', esto la encontrará
+    $fotoNavbar = ($psicologaAutenticada && $psicologaAutenticada->imagen) 
+        ? "https://admin.umbrellastella.com/storage/psicologos/" . $psicologaAutenticada->imagen 
+        : asset('assets/iconos/perfil_psicologa.jpg');
+@endphp
 
-    {{-- Nombre del Usuario --}}
-    <span class="hidden md:block text-sm text-white font-medium">
-        {{ session('usuario') ?? 'Usuario' }}
-    </span>
-
-    {{-- Flecha indicadora --}}
-    <svg class="w-3.5 h-3.5 text-white/60 hidden md:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
-    </svg>
-</button>
+{{-- En tu botón del Dropdown --}}
+<img class="w-8 h-8 rounded-full border-2 object-cover"
+     style="border-color:var(--morado-claro);"
+     src="{{ $fotoNavbar }}"
+     alt="Foto de perfil">
+                        <span class="hidden md:block text-sm text-white font-medium">
+                            {{ session('usuario') ?? 'Usuario' }}
+                        </span>
+                        <svg class="w-3.5 h-3.5 text-white/60 hidden md:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
 
                     <div id="dropdown-user"
                         class="z-50 hidden absolute right-0 mt-2 w-48 shadow-xl py-1 overflow-hidden"
