@@ -48,6 +48,8 @@ public function login(Request $request)
         'usuario'      => $psicologo->usuario,
         'correo'       => $psicologo->correo,
         'id_psicologa' => $psicologo->id_psicologa,
+        'foto_perfil'  => $psicologo->url_imagen,
+
     ]);
 }
 
