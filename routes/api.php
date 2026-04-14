@@ -6,18 +6,21 @@ use App\Http\Controllers\Api\EjerciciosController;
 use App\Http\Controllers\Api\GoogleAuthController;
 use App\Http\Controllers\Api\CalendarController;
 use App\Http\Controllers\Api\DashboardController;
+
 // 1. Diagnóstico y Públicas
 Route::get('/ping', function () {
     return response()->json(['message' => 'API funcionando']);
 });
-
+Route::get('/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
 Route::post('/login', [AuthController::class, 'login']);
 
 // 2. Rutas de Google OAuth (FUERA del fallback y del middleware auth)
 Route::prefix('auth')->group(function () {
     Route::get('/google/redirect', [GoogleAuthController::class, 'redirect']);
     Route::get('/google/callback', [GoogleAuthController::class, 'callback']);
+    
 });
+
 
 // 3. Rutas Protegidas (Requieren Token Sanctum)
 Route::middleware('auth:sanctum')->group(function () {
