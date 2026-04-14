@@ -47,7 +47,7 @@
                     
                    
                 </div>
-                <p class="text-xs text-gray-400 mt-4 font-bold uppercase tracking-widest">Retrato de la Psicóloga</p>
+                <p class="text-xs text-gray-400 mt-4 font-bold uppercase tracking-widest"></p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
