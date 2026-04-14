@@ -51,7 +51,7 @@ public function getUrlImagenAttribute()
 {
     $valorReal = $this->attributes['imagen'] ?? null;
 
-    if (!$valorReal) {
+    if (empty($valorReal)) {
         return asset('assets/iconos/perfil_psicologa.jpg');
     }
 
