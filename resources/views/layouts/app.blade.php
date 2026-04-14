@@ -201,15 +201,9 @@
                         aria-haspopup="true">
                         
 
-@php
-    // Buscamos al psicólogo actual por su ID de sesión
-    $psicoActivo = \App\Models\Psicologo::find(session('id_psicologa'));
-@endphp
-
 <img class="w-8 h-8 rounded-full border-2 object-cover"
      style="border-color:var(--morado-claro);"
-     {{-- Invocamos el accessor url_imagen que acabamos de corregir --}}
-     src="{{ $psicoActivo ? $psicoActivo->url_imagen : 'https://admin.umbrellastella.com/assets/iconos/perfil_psicologa.jpg' }}"
+     src="{{ $psicologoGlobal && $psicologoGlobal->url_imagen ? $psicologoGlobal->url_imagen : asset('assets/iconos/perfil_psicologa.jpg') }}"
      alt="Foto de perfil">
 
 
@@ -336,8 +330,10 @@
             {{-- Footer sidebar --}}
             <div id="sidebar-footer" class="mt-auto pt-4">
                 <div class="flex items-center gap-3 px-2">
-                    <img src="{{ $fotoPerfil }}" class="w-8 h-8 rounded-full object-cover" alt="Avatar">
-                    <div class="overflow-hidden">
+<img class="w-8 h-8 rounded-full border-2 object-cover"
+     style="border-color:var(--morado-claro);"
+     src="{{ $psicologoGlobal && $psicologoGlobal->url_imagen ? $psicologoGlobal->url_imagen : asset('assets/iconos/perfil_psicologa.jpg') }}"
+     alt="Foto de perfil">                    <div class="overflow-hidden">
                         <p class="footer-name truncate">{{ session('usuario') ?? 'Usuario' }}</p>
                         <p class="footer-role truncate">Psicólogo</p>
                     </div>
