@@ -18,7 +18,7 @@ class GoogleAuthController extends Controller
             ->redirect();
     }
 
-    // 2. Recibir respuesta de Google y "saltar" al Cliente
+    // 2. Recibir respuesta de Google y "saltar" al Cliente 
     public function callback()
     {
         try {
@@ -42,7 +42,7 @@ class GoogleAuthController extends Controller
     
             if (!$user) {
                 // Si no existe, lo mandamos al login del CLIENTE (8002) con error
-                return redirect("http://127.0.0.1:8002/login?error=no_registrado");
+                return redirect("http://cliente.umbrellastella.com/login?error=no_registrado");
             }
 
             // Creamos el token de Sanctum (tu llave para el santuario)
@@ -53,10 +53,10 @@ class GoogleAuthController extends Controller
       
 
             
-            return redirect("http://127.0.0.1:8002/auth/callback?token={$token}&google_token={$googleToken}");
+            return redirect("http://cliente.umbrellastella.com/auth/callback?token={$token}&google_token={$googleToken}");
             
         } catch (\Exception $e) {
-            return redirect("http://127.0.0.1:8002/login?error=error");
+            return redirect("http://cliente.umbrellastella.com/login?error=error");
         }
     }
 }
