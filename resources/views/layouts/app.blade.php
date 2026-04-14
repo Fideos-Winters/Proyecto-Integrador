@@ -160,11 +160,7 @@
     $urlFinal = $psicologoGlobal ? $psicologoGlobal->url_imagen : asset('assets/iconos/perfil_psicologa.jpg');
 @endphp
 
-    {{-- Solo para depurar --}}
-<div style="color: black; background: white; position: fixed; top: 0; z-index: 9999;">
-    ID en sesión: {{ session('id_psicologa') }} | 
-    ¿Encontró psicólogo?: {{ $psicologoGlobal ? 'SÍ' : 'NO' }}
-</div>
+
 
     {{-- ═══════════ NAVBAR ═══════════ --}}
     <nav id="navbar" class="fixed top-0 z-50 w-full">
