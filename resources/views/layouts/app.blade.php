@@ -152,15 +152,24 @@
 
 <body class="bg-gray-100">
 
-    @php
-        //se busca el modelo la foto de perfil
-        $psicologoGlobal = \App\Models\Psicologo::find(session('id_psicologa'));
-        
-        $fotoPerfil = $psicologoGlobal ? $psicologoGlobal->url_imagen : asset('assets/iconos/perfil_psicologa.jpg');
-    @endphp
+ @php
+    // Buscamos al psicólogo una sola vez
+    $psicologoGlobal = \App\Models\Psicologo::find(session('id_psicologa'));
+    
+    // Guardamos la URL final en una variable simple
+    $urlFinal = $psicologoGlobal ? $psicologoGlobal->url_imagen : asset('assets/iconos/perfil_psicologa.jpg');
+@endphp
+
+    {{-- Solo para depurar --}}
+<div style="color: black; background: white; position: fixed; top: 0; z-index: 9999;">
+    ID en sesión: {{ session('id_psicologa') }} | 
+    ¿Encontró psicólogo?: {{ $psicologoGlobal ? 'SÍ' : 'NO' }}
+</div>
 
     {{-- ═══════════ NAVBAR ═══════════ --}}
     <nav id="navbar" class="fixed top-0 z-50 w-full">
+
+    
         <div class="px-4 py-3 flex items-center justify-between">
 
             <div class="flex items-center gap-3">
@@ -298,10 +307,16 @@
             {{-- Footer sidebar --}}
             <div id="sidebar-footer" class="mt-auto pt-4">
                 <div class="flex items-center gap-3 px-2">
+
+
+
 <img class="w-8 h-8 rounded-full border-2 object-cover"
      style="border-color:var(--morado-claro);"
-     src="{{ $psicologoGlobal && $psicologoGlobal->url_imagen ? $psicologoGlobal->url_imagen : asset('assets/iconos/perfil_psicologa.jpg') }}"
+     src="{{ $urlFinal }}"
      alt="Foto de perfil">                    <div class="overflow-hidden">
+
+
+
                         <p class="footer-name truncate">{{ session('usuario') ?? 'Usuario' }}</p>
                         <p class="footer-role truncate">Psicólogo</p>
                     </div>
