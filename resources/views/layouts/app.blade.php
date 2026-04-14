@@ -201,7 +201,7 @@
                         aria-haspopup="true">
                         <img class="w-8 h-8 rounded-full border-2 object-cover"
                             style="border-color:var(--morado-claro);"
-                            src="{{ $fotoPerfil }}"
+                            src="/storage/psicologos/rdk35y97bZKOAB1BHoIoHbMz0IObgEqL3rSTRO2b.jpg"
                             alt="Foto de perfil">
                         <span class="hidden md:block text-sm text-white font-medium">
                             {{ session('usuario') ?? 'Usuario' }}
