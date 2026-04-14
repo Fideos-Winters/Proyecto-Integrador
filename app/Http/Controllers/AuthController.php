@@ -9,11 +9,13 @@ use App\Models\Psicologo;
 class AuthController extends Controller
 {
 public function login(Request $request)
-{
+{   
     $request->validate([
         'usuario'    => 'required|string',
-        'contrasena' => 'required|string',
+        'contrasena' => 'required|string',  
     ]);
+
+    
 
     $psicologo = Psicologo::where('usuario', $request->usuario)->first();
 
@@ -21,20 +23,21 @@ public function login(Request $request)
         return response()->json([
             'message' => 'Credenciales incorrectas.'
         ], 401);
-    }
+    }       
+    
 
     // Revocar tokens anteriores 
     $psicologo->tokens()->delete();
 
     $token = $psicologo->createToken('auth_token')->plainTextToken;
 
-    // ── AQUÍ ESTÁ LA MAGIA PARA EL LAYOUT ──────────────────────────
     // Guardamos los datos en la sesión para que Blade pueda leerlos
     session([
         'id_psicologa' => $psicologo->id_psicologa,
         'usuario'      => $psicologo->usuario,
         'correo'       => $psicologo->correo,
-        'token'        => $token // Opcional, por si lo necesitas luego
+        'token'        => $token,
+        'foto_perfil'  => $psicologo->url_imagen,
     ]);
     // ───────────────────────────────────────────────────────────────
 
