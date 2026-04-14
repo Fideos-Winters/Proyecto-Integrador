@@ -15,7 +15,7 @@
     
     <!-- Sección de imagen -->
     <div class="w-1/2 bg-gradient-to-b from-[#010e6b] via-[#be74be] via-[#d481d2] to-[#703b94] flex items-center justify-center">
-      <img src="http://admin.umbrellastella.com/assets/iconos/logo.png" alt="Login Image" class="rounded-lg shadow-lg max-h-[80%]">
+<img src="{{ asset('storage/imagenes/pagina/logo.png') }}" alt="Login Image" class="rounded-lg shadow-lg max-h-[80%]">
     </div>
 
     <!-- Sección de formulario -->
