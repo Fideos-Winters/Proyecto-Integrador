@@ -199,10 +199,29 @@
                         class="flex items-center gap-2 rounded-full focus:outline-none"
                         aria-expanded="false"
                         aria-haspopup="true">
-                        <img class="w-8 h-8 rounded-full border-2 object-cover"
-                            style="border-color:var(--morado-claro);"
-                            src="{{ $fotoPerfil }}"
-                            alt="Foto de perfil">
+                        
+
+{{-- 1. Buscamos al psicólogo en tiempo real usando el ID de la sesión --}}
+@php
+    $psicologaAutenticada = \App\Models\Psicologo::find(session('id_psicologa'));
+    
+    // Si por alguna razón no lo encuentra, usamos la imagen por defecto
+    $sourceImagen = $psicologaAutenticada 
+        ? $psicologaAutenticada->url_imagen 
+        : asset('assets/iconos/perfil_psicologa.jpg');
+@endphp
+
+{{-- 2. El Dropdown con la imagen actualizada --}}
+<img class="w-8 h-8 rounded-full border-2 object-cover"
+     style="border-color:var(--morado-claro);"
+     src="{{ $sourceImagen }}"
+     alt="Foto de perfil">
+
+
+
+
+
+
                         <span class="hidden md:block text-sm text-white font-medium">
                             {{ session('usuario') ?? 'Usuario' }}
                         </span>

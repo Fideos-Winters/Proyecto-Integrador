@@ -59,7 +59,6 @@ public function getUrlImagenAttribute()
         return $valorReal;
     }
 
-    return asset('storage/' . $valorReal);
-}
+return "https://admin.umbrellastella.com/storage/" . $valorReal;}
 
 }
