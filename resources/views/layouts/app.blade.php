@@ -202,14 +202,15 @@
                         
 
 @php
-    $psico = \App\Models\Psicologo::find(session('id_psicologa'));
+    // Buscamos al psicólogo actual por su ID de sesión
+    $psicoActivo = \App\Models\Psicologo::find(session('id_psicologa'));
 @endphp
 
 <img class="w-8 h-8 rounded-full border-2 object-cover"
      style="border-color:var(--morado-claro);"
-     src="{{ $psico ? $psico->url_imagen : asset('assets/iconos/perfil_psicologa.jpg') }}"
+     {{-- Invocamos el accessor url_imagen que acabamos de corregir --}}
+     src="{{ $psicoActivo ? $psicoActivo->url_imagen : 'https://admin.umbrellastella.com/assets/iconos/perfil_psicologa.jpg' }}"
      alt="Foto de perfil">
-
 
 
 

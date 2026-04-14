@@ -51,22 +51,21 @@ public function getUrlImagenAttribute()
 {
     $valorReal = $this->attributes['imagen'] ?? null;
 
+    // 1. Si no hay nada, el default
     if (empty($valorReal)) {
-        return asset('assets/iconos/perfil_psicologa.jpg');
+        return "https://admin.umbrellastella.com/assets/iconos/perfil_psicologa.jpg";
     }
 
-    // Si es una URL completa (Google), la mandamos tal cual
+    // 2. Si es de Google, se manda tal cual
     if (filter_var($valorReal, FILTER_VALIDATE_URL)) {
         return $valorReal;
     }
 
-    // LIMPIEZA: Si el valor ya empieza con 'psicologos/', lo usamos directo.
-    // Si no, se lo agregamos.
-    $path = \Illuminate\Support\Str::startsWith($valorReal, 'psicologos/') 
-            ? $valorReal 
-            : 'psicologos/' . $valorReal;
+    // 3. Limpieza: Nos aseguramos de que no tenga prefijos raros
+    // El valorReal ya debe traer "psicologos/nombre.jpg"
+    $path = ltrim($valorReal, '/');
 
-    // Forzamos la URL absoluta que ya comprobamos que funciona
+    // 4. Construimos la URL que SÍ FUNCIONA
     return "https://admin.umbrellastella.com/storage/" . $path;
 }
 
