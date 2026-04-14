@@ -71,4 +71,13 @@ class AuthController extends Controller
         // Retornamos los datos frescos del usuario autenticado
         return response()->json($request->user());
     }
+    
+    public function guardarSesion(Request $request) {
+    session([
+        'id_psicologa' => $request->id_psicologa, // ¡Sin esto no hay foto!
+        'usuario'      => $request->usuario,
+        'token'        => $request->token,
+    ]);
+    return response()->json(['status' => 'ok']);
+}
 }

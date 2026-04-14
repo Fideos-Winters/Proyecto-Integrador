@@ -45,6 +45,7 @@ Route::post('/guardar-sesion', function (Request $request) {
     session(['token'   => $request->token]);
     session(['usuario' => $request->usuario]);
     session(['correo'  => $request->correo]);
+    session(['id_psicologa' => $request->id_psicologa]);
     return response()->json(['ok' => true]);
 });
 

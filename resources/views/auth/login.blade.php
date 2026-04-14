@@ -50,57 +50,64 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
 
   <script>
-    document.getElementById('loginForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
 
-      const usuario    = document.getElementById('usuario').value;
-      const contrasena = document.getElementById('password').value;
-      const errorMsg   = document.getElementById('errorMsg');
-      const btnLogin   = document.getElementById('btnLogin');
+    const usuario    = document.getElementById('usuario').value;
+    const contrasena = document.getElementById('password').value;
+    const errorMsg   = document.getElementById('errorMsg');
+    const btnLogin   = document.getElementById('btnLogin');
 
-      // Limpiar error y deshabilitar botón
-      errorMsg.classList.add('hidden');
-      btnLogin.disabled = true;
-      btnLogin.textContent = 'Entrando...';
+    errorMsg.classList.add('hidden');
+    btnLogin.disabled = true;
+    btnLogin.textContent = 'Entrando...';
 
-      try {
+    try {
+        // 1. Login en la API
         const response = await fetch('/api/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-          body: JSON.stringify({ usuario, contrasena }),
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ usuario, contrasena }),
         });
 
         const data = await response.json();
 
-      if (response.ok) {
-         // En vez de localStorage, llamamos a una ruta web que guarda en sesión
-         const sessionRes = await fetch('/guardar-sesion', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-        },
-        body: JSON.stringify({ token: data.access_token, usuario: data.usuario }),
-         });
+        if (response.ok) {
+            // 2. Guardar en la sesión WEB (Blade)
+            await fetch('/guardar-sesion', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({ 
+                    token: data.access_token, 
+                    usuario: data.usuario,
+                    correo: data.correo, // Enviamos el correo también
+                    id_psicologa: data.id_psicologa // <--- VITAL PARA LA FOTO
+                }),
+            });
 
-    window.location.href = '/inicio';
+            window.location.href = '/inicio';
         } else {
-          errorMsg.textContent = data.message || 'Usuario o contraseña incorrectos.';
-          errorMsg.classList.remove('hidden');
+            errorMsg.textContent = data.message || 'Usuario o contraseña incorrectos.';
+            errorMsg.classList.remove('hidden');
         }
-
-      } catch (error) {
+    } catch (error) {
         errorMsg.textContent = 'Error de conexión. Intenta de nuevo.';
         errorMsg.classList.remove('hidden');
-      } finally {
+    } finally {
         btnLogin.disabled = false;
         btnLogin.textContent = 'Entrar';
-      }
-    });
-  </script>
+    }
+});
+</script>
 
 </body>
 </html>
