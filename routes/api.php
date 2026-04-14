@@ -11,7 +11,7 @@ use App\Http\Controllers\Api\DashboardController;
 Route::get('/ping', function () {
     return response()->json(['message' => 'API funcionando']);
 });
-Route::get('/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
+
 Route::post('/login', [AuthController::class, 'login']);
 
 // 2. Rutas de Google OAuth (FUERA del fallback y del middleware auth)
