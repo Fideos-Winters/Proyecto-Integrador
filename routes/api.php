@@ -7,38 +7,44 @@ use App\Http\Controllers\Api\GoogleAuthController;
 use App\Http\Controllers\Api\CalendarController;
 use App\Http\Controllers\Api\DashboardController;
 
-// 1. Diagnóstico y Públicas
-Route::get('/ping', function () {
-    return response()->json(['message' => 'API funcionando']);
-});
+/**
+ * Rutas Públicas de Diagnóstico
+ */
+Route::get('/ping', fn() => response()->json(['message' => 'API Admin en línea']));
 
-Route::post('/login', [AuthController::class, 'login']);
+/**
+ * Autenticación de Administrador / Login Tradicional
+ * Se asigna nombre 'login' para prevenir excepciones de redirección en Sanctum.
+ */
+Route::post('/login', [AuthController::class, 'login'])->name('login');
 
-// 2. Rutas de Google OAuth (FUERA del fallback y del middleware auth)
+/**
+ * Ritual de Google OAuth para Pacientes
+ */
 Route::prefix('auth')->group(function () {
     Route::get('/google/redirect', [GoogleAuthController::class, 'redirect']);
     Route::get('/google/callback', [GoogleAuthController::class, 'callback']);
-    
 });
 
-
-// 3. Rutas Protegidas (Requieren Token Sanctum)
+/**
+ * Rutas Protegidas vía Sanctum
+ * Requieren el encabezado: Authorization: Bearer {token}
+ */
 Route::middleware('auth:sanctum')->group(function () {
+    
+    // Gestión de Sesión
+    Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/me',      [AuthController::class, 'me']);
 
+    // Recursos del Paciente
+    Route::get('/dashboard', [DashboardController::class, 'index']);
     Route::get('/ejercicios', [EjerciciosController::class, 'index']);
     
-// AQUÍ ES DONDE SUCEDE LA MAGIA
-    Route::get('/dashboard', [DashboardController::class, 'index']);
-    Route::middleware('auth:sanctum')->post('/citas/sincronizar', [CalendarController::class, 'sincronizar']);    
-    // También el endpoint 'me' por si lo necesitas
-    Route::get('/me', [AuthController::class, 'me']);});
-
-// 4. Fallback (DEBE IR AL FINAL DE TODO)
-Route::fallback(function(){
-    return response()->json([
-        'status' => 'error',
-        'message' => 'Ruta no encontrada. Revisa la documentación de la API.'
-    ], 404);
+    // Sincronización de Calendario (Google Calendar)
+    Route::post('/citas/sincronizar', [CalendarController::class, 'sincronizar']);
 });
+
+/**
+ * Captura de Rutas inexistentes (Fallback)
+ */
+Route::fallback(fn() => response()->json(['status' => 'error', 'message' => 'Endpoint no encontrado'], 404));
