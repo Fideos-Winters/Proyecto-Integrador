@@ -82,7 +82,22 @@ Route::get('/inicio', [App\Http\Controllers\InicioController::class, 'principal'
     Route::get('/notificaciones', [App\Http\Controllers\NotificacionController::class, 'index'])
     ->name('notificaciones.index');
 
+Route::post('/guardar-sesion', function (Request $request) {
+    // ESTO MATARÁ LA APLICACIÓN Y TE MOSTRARÁ LOS DATOS EN LA CONSOLA DEL NAVEGADOR
+    // Si al loguearte ves un error 500 en la consola (Network), 
+    // abre la respuesta y busca si sale el id_psicologa aquí.
+    // dd($request->all()); 
 
+    if (!$request->id_psicologa) {
+         return response()->json(['error' => 'No llegó el ID'], 400);
+    }
+
+    session(['id_psicologa' => $request->id_psicologa]);
+    session(['usuario' => $request->usuario]);
+    session()->save(); 
+
+    return response()->json(['ok' => true, 'id_guardado' => session('id_psicologa')]);
+});
 
     //psicologos
 Route::resource('psicologos', PsicologoController::class)->parameters([
