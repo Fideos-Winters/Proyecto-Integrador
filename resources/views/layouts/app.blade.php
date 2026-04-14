@@ -199,22 +199,10 @@
                         class="flex items-center gap-2 rounded-full focus:outline-none"
                         aria-expanded="false"
                         aria-haspopup="true">
-                        @php
-    // No confíes solo en la sesión, busca al psicólogo actual por su ID
-    $psicologaAutenticada = \App\Models\Psicologo::find(session('id_psicologa'));
-    
-    // Usamos el Accessor que forjamos o construimos la ruta manualmente
-    // Si el registro tiene 'JFyu3iFAsg7zHYsQbn8351hccSFNwZvMYGeukJ9F.jpg', esto la encontrará
-    $fotoNavbar = ($psicologaAutenticada && $psicologaAutenticada->imagen) 
-        ? "https://admin.umbrellastella.com/storage/psicologos/" . $psicologaAutenticada->imagen 
-        : asset('assets/iconos/perfil_psicologa.jpg');
-@endphp
-
-{{-- En tu botón del Dropdown --}}
-<img class="w-8 h-8 rounded-full border-2 object-cover"
-     style="border-color:var(--morado-claro);"
-     src="{{ $fotoNavbar }}"
-     alt="Foto de perfil">
+                        <img class="w-8 h-8 rounded-full border-2 object-cover"
+                            style="border-color:var(--morado-claro);"
+                            src="{{ $fotoPerfil }}"
+                            alt="Foto de perfil">
                         <span class="hidden md:block text-sm text-white font-medium">
                             {{ session('usuario') ?? 'Usuario' }}
                         </span>
