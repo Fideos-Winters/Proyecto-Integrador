@@ -201,22 +201,14 @@
                         aria-haspopup="true">
                         
 
-{{-- 1. Buscamos al psicólogo en tiempo real usando el ID de la sesión --}}
 @php
-    $psicologaAutenticada = \App\Models\Psicologo::find(session('id_psicologa'));
-    
-    // Si por alguna razón no lo encuentra, usamos la imagen por defecto
-    $sourceImagen = $psicologaAutenticada 
-        ? $psicologaAutenticada->url_imagen 
-        : asset('assets/iconos/perfil_psicologa.jpg');
+    $psico = \App\Models\Psicologo::find(session('id_psicologa'));
 @endphp
 
-{{-- 2. El Dropdown con la imagen actualizada --}}
 <img class="w-8 h-8 rounded-full border-2 object-cover"
      style="border-color:var(--morado-claro);"
-     src="{{ $sourceImagen }}"
+     src="{{ $psico ? $psico->url_imagen : asset('assets/iconos/perfil_psicologa.jpg') }}"
      alt="Foto de perfil">
-
 
 
 

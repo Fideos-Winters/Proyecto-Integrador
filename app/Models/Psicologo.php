@@ -55,10 +55,19 @@ public function getUrlImagenAttribute()
         return asset('assets/iconos/perfil_psicologa.jpg');
     }
 
-    if (\Illuminate\Support\Str::startsWith($valorReal, 'http')) {
+    // Si es una URL completa (Google), la mandamos tal cual
+    if (filter_var($valorReal, FILTER_VALIDATE_URL)) {
         return $valorReal;
     }
 
-return "https://admin.umbrellastella.com/storage/" . $valorReal;}
+    // LIMPIEZA: Si el valor ya empieza con 'psicologos/', lo usamos directo.
+    // Si no, se lo agregamos.
+    $path = \Illuminate\Support\Str::startsWith($valorReal, 'psicologos/') 
+            ? $valorReal 
+            : 'psicologos/' . $valorReal;
+
+    // Forzamos la URL absoluta que ya comprobamos que funciona
+    return "https://admin.umbrellastella.com/storage/" . $path;
+}
 
 }
