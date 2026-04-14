@@ -92,7 +92,15 @@ Route::resource('psicologos', PsicologoController::class)->parameters([
     
 ]);
     // Cualquier otra ruta que añadas aquí también estará protegida por el middleware 'auth.token'
-
+// Temporalmente en routes/web.php del ADMIN
+Route::get('/fijar-storage', function () {
+    $target = storage_path('app/public');
+    $shortcut = public_html_path() . '/storage'; // O la ruta a tu carpeta public en Hostinger
+    
+    // El comando de Laravel que hace la magia
+    Artisan::call('storage:link');
+    return "El portal de imágenes ha sido restaurado.";
+});
 
     
 });
