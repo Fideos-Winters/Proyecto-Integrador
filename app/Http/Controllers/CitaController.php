@@ -12,158 +12,127 @@ class CitaController extends Controller
     /**
      * Lista todas las citas con sus pacientes (Eager Loading)
      */
-    public function index()
-    {
-        $hoy = Carbon::today()->toDateString();
+public function index() 
+{
+    // Obtenemos la fecha de hoy usando Carbon
+    $hoy = \Carbon\Carbon::today()->toDateString();
 
-        $citas = Cita::with('paciente')
-            ->where('fecha', '>=', $hoy)
-            ->orderBy('fecha', 'asc')
-            ->orderBy('hora', 'asc')
-            ->get();
+    // Filtramos: fecha mayor o igual a hoy
+    $citas = Cita::with('paciente')
+        ->where('fecha', '>=', $hoy) 
+        ->orderBy('fecha', 'asc')
+        ->orderBy('hora', 'asc')
+        ->get();
 
-        return view('citas.index', compact('citas'));
-    }
+    return view('citas.index', compact('citas'));
+}
 
-    public function historial()
-    {
-        $hoy = Carbon::today()->toDateString();
+    public function historial() 
+{
+    $hoy = \Carbon\Carbon::today()->toDateString();
 
-        $citas = Cita::with('paciente')
-            ->where('fecha', '<', $hoy)
-            ->orderBy('fecha', 'desc')
-            ->orderBy('hora', 'desc')
-            ->get();
+    // Traemos solo las que ya pasaron
+    $citas = Cita::with('paciente')
+        ->where('fecha', '<', $hoy) 
+        ->orderBy('fecha', 'desc') // La última que pasó aparece primero
+        ->orderBy('hora', 'desc')
+        ->get();
 
-        return view('citas.historial', compact('citas'));
-    }
+    // Reutilizamos la misma vista o una copia con título diferente
+    return view('citas.historial', compact('citas'));
+}
+
+
 
     /**
      * Muestra el formulario de creación
      */
     public function create()
     {
-        $pacientes  = Paciente::orderBy('nombre', 'asc')->get();
-        $fechaMin   = Carbon::today()->toDateString(); // Para el atributo min del input date en la vista
-        return view('citas.create', compact('pacientes', 'fechaMin'));
+        $pacientes = Paciente::orderBy('nombre', 'asc')->get();
+        return view('citas.create', compact('pacientes'));
     }
 
     /**
-     * Valida y guarda la nueva cita.
-     * Reglas:
-     *   1. La fecha no puede ser anterior a hoy.
-     *   2. No puede existir otra cita el mismo día dentro de un rango de ±60 minutos.
+     * Valida y guarda la nueva cita
      */
     public function store(Request $request)
     {
-        // ── 1. Validaciones básicas ──────────────────────────────────────────
+        // Validaciones optimizadas
         $request->validate([
             'id_pacientes' => 'required|exists:pacientes,id_pacientes',
-            'fecha'        => 'required|date|after_or_equal:today',
-            'hora'         => 'required|date_format:H:i',
-            'id_psicologa' => 'nullable|integer',
+            'fecha'        => 'required|date|after_or_equal:today', // No citas en el pasado
+            'hora'         => 'required',
+            'id_psicologa' => 'nullable|integer'
         ], [
-            'fecha.after_or_equal'  => 'No puedes agendar citas en días que ya pasaron.',
-            'id_pacientes.exists'   => 'El paciente seleccionado no es válido.',
-            'hora.date_format'      => 'El formato de hora debe ser HH:MM (ej. 09:30).',
+            // Mensajes personalizados (opcional)
+            'fecha.after_or_equal' => 'No puedes agendar citas en días que ya pasaron.',
+            'id_pacientes.exists'  => 'El paciente seleccionado no es válido.'
         ]);
 
-        // ── 2. Verificar solapamiento (±60 min el mismo día) ─────────────────
-        $conflicto = $this->buscarConflictoHorario(
-            fecha     : $request->fecha,
-            hora      : $request->hora,
-            excluirId : null   // en store no hay cita a excluir
-        );
-
-        if ($conflicto) {
-            $horaConflicto = Carbon::parse($conflicto->hora)->format('H:i');
-            return back()
-                ->withInput()
-                ->withErrors([
-                    'hora' => "Ya existe una cita a las {$horaConflicto}. "
-                            . "Debes dejar al menos 1 hora de diferencia entre citas.",
-                ]);
-        }
-
-        // ── 3. Crear ─────────────────────────────────────────────────────────
+        // Creación masiva (Asegúrate de tener $fillable en el Modelo Cita)
         Cita::create([
             'id_pacientes' => $request->id_pacientes,
             'fecha'        => $request->fecha,
             'hora'         => $request->hora,
-            'id_psicologa' => 1, // Cambiar a auth()->id() cuando tengas login
+            'id_psicologa' => 1, // Ajustar a auth()->id() cuando tengas login listo
         ]);
 
         return redirect()->route('citas.index')
-            ->with('success', 'Cita agendada correctamente.');
+            ->with('success', 'La llama se mantiene: Cita agendada correctamente.');
     }
 
     /**
-     * Muestra el formulario de edición.
-     * Pasa la fecha mínima para bloquear días pasados en el date-picker.
+     * Muestra el formulario para editar (Preparado para el siguiente paso)
      */
     public function edit($id)
     {
-        $cita      = Cita::findOrFail($id);
-        $pacientes = Paciente::orderBy('nombre', 'asc')->get();
-        $fechaMin  = Carbon::today()->toDateString();
-
-        return view('citas.edit', compact('cita', 'pacientes', 'fechaMin'));
-    }
-
-    /**
-     * Actualiza la cita.
-     * Mismas reglas que store, pero excluye la propia cita al revisar solapamiento.
-     */
-    public function update(Request $request, $id)
-    {
-        // ── 1. Validaciones básicas ──────────────────────────────────────────
-        $request->validate([
-            'id_pacientes' => 'required|exists:pacientes,id_pacientes',
-            'fecha'        => 'required|date|after_or_equal:today',
-            'hora'         => 'required|date_format:H:i',
-        ], [
-            'fecha.after_or_equal' => 'No puedes reprogramar una cita para una fecha que ya pasó.',
-            'id_pacientes.exists'  => 'El paciente seleccionado no es válido.',
-            'hora.date_format'     => 'El formato de hora debe ser HH:MM (ej. 09:30).',
-        ]);
-
-        // ── 2. Verificar solapamiento excluyendo la cita actual ───────────────
-        $conflicto = $this->buscarConflictoHorario(
-            fecha     : $request->fecha,
-            hora      : $request->hora,
-            excluirId : $id        // excluimos la propia cita para no bloquearse a sí misma
-        );
-
-        if ($conflicto) {
-            $horaConflicto = Carbon::parse($conflicto->hora)->format('H:i');
-            return back()
-                ->withInput()
-                ->withErrors([
-                    'hora' => "Ya existe una cita a las {$horaConflicto}. "
-                            . "Debes dejar al menos 1 hora de diferencia entre citas.",
-                ]);
-        }
-
-        // ── 3. Localizar y actualizar ─────────────────────────────────────────
         $cita = Cita::findOrFail($id);
-
-        // Limpiar notificaciones si cambió la fecha
-        if ($cita->fecha !== $request->fecha) {
-            $cita->notificaciones()->delete();
-        }
-
-        $cita->update([
-            'id_pacientes' => $request->id_pacientes,
-            'fecha'        => $request->fecha,
-            'hora'         => $request->hora,
-        ]);
-
-        return redirect()->route('citas.index')
-            ->with('success', 'Cita actualizada. El sistema recalculará las notificaciones.');
+        $pacientes = Paciente::all();
+        return view('citas.edit', compact('cita', 'pacientes'));
     }
 
     /**
-     * Elimina la cita.
+     * Actualiza la cita
+     */
+public function update(Request $request, $id)
+{
+    // 1. Validaciones estrictas
+    $request->validate([
+        'id_pacientes' => 'required|exists:pacientes,id_pacientes',
+        'fecha'        => 'required|date|after_or_equal:today', 
+        'hora'         => 'required',
+    ], [
+        'fecha.after_or_equal' => 'No puedes reprogramar una cita para una fecha que ya pasó.',
+        'id_pacientes.exists'  => 'El paciente seleccionado no es válido.',
+    ]);
+
+    // 2. Localizar la cita
+    $cita = Cita::findOrFail($id);
+
+    // --- LÓGICA DE LIMPIEZA DE NOTIFICACIONES ---
+    // Si la fecha actual en la DB es distinta a la nueva fecha del formulario...
+    if ($cita->fecha !== $request->fecha) {
+        // Borramos todas las notificaciones asociadas a esta cita.
+        // Esto usa la relación que creamos en el modelo Cita.
+        $cita->notificaciones()->delete();
+    }
+    // --------------------------------------------
+
+    // 3. Actualizar los datos
+    $cita->update([
+        'id_pacientes' => $request->id_pacientes,
+        'fecha'        => $request->fecha,
+        'hora'         => $request->hora,
+    ]);
+
+    // Redirigir al index con mensaje de éxito
+    return redirect()->route('citas.index')
+                     ->with('success', 'Cita actualizada. El sistema recalculará las notificaciones.');
+}
+
+    /**
+     * Elimina la cita
      */
     public function destroy($id)
     {
@@ -172,39 +141,5 @@ class CitaController extends Controller
 
         return redirect()->route('citas.index')
             ->with('success', 'La cita ha sido borrada del registro.');
-    }
-
-    // ══════════════════════════════════════════════════════════════════════════
-    // MÉTODO PRIVADO: buscar conflicto de horario
-    // ══════════════════════════════════════════════════════════════════════════
-
-    /**
-     * Busca si existe alguna cita el mismo día cuya hora esté a menos de 60 minutos
-     * de la hora solicitada.
-     *
-     * @param  string      $fecha      Fecha en formato Y-m-d
-     * @param  string      $hora       Hora en formato H:i
-     * @param  int|null    $excluirId  ID de cita a ignorar (útil en update)
-     * @return Cita|null               La cita conflictiva, o null si no hay conflicto
-     */
-    private function buscarConflictoHorario(string $fecha, string $hora, ?int $excluirId): ?Cita
-    {
-        $horaCarbon = Carbon::parse("{$fecha} {$hora}");
-
-        // Ventana de bloqueo: desde 1 minuto después de la hora anterior
-        // hasta 59 minutos después de la hora solicitada.
-        // Equivale a: no permitir dos citas a menos de 60 minutos de distancia.
-        $desde = $horaCarbon->copy()->subMinutes(59)->format('H:i:s');
-        $hasta = $horaCarbon->copy()->addMinutes(59)->format('H:i:s');
-
-        $query = Cita::where('fecha', $fecha)
-            ->whereBetween('hora', [$desde, $hasta]);
-
-        // En update, excluimos la propia cita para que no se bloquee a sí misma
-        if ($excluirId !== null) {
-            $query->where('id', '!=', $excluirId);
-        }
-
-        return $query->first();
     }
 }
