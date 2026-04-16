@@ -9,10 +9,8 @@ class EjerciciosController extends Controller
 {
     public function index(Request $request)
     {
-        // En el API Admin, el usuario autenticado se obtiene así:
         $extraPaciente = $request->user(); 
 
-        // Verificamos que exista el recurso para evitar errores 500
         if (!$extraPaciente) {
             return response()->json([
                 'status' => 'error',
@@ -27,7 +25,6 @@ class EjerciciosController extends Controller
             ->orderByDesc('id_ejercicios')
             ->get();
 
-        // Devolvemos JSON
         return response()->json([
             'status'  => 'success',
             'paciente' => $paciente,

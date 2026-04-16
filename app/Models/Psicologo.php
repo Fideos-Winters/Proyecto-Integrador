@@ -61,11 +61,10 @@ public function getUrlImagenAttribute()
         return $valorReal;
     }
 
-    // 3. Limpieza: Nos aseguramos de que no tenga prefijos raros
-    // El valorReal ya debe traer "psicologos/nombre.jpg"
+  
     $path = ltrim($valorReal, '/');
 
-    // 4. Construimos la URL que SÍ FUNCIONA
+    // 4. Construimos la URL de la imagen
     return "https://admin.umbrellastella.com/storage/" . $path;
 }
 

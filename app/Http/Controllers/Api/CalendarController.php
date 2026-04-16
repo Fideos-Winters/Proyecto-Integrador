@@ -50,7 +50,7 @@ public function sincronizar(\Illuminate\Http\Request $request)
     $ultimoError = '';
 
     foreach ($citas as $cita) {
-        // Google necesita formato: 2023-12-31T15:00:00
+        
         $inicio = date('Y-m-d\TH:i:s', strtotime($cita->fecha . ' ' . $cita->hora));
         $fin = date('Y-m-d\TH:i:s', strtotime($cita->fecha . ' ' . $cita->hora) + 3600);
 
@@ -68,7 +68,6 @@ public function sincronizar(\Illuminate\Http\Request $request)
             $exitosas++;
         } else {
             $errores++;
-            // Guardamos el error para saber qué pasó
             $ultimoError = $response->json()['error']['message'] ?? 'Error desconocido';
         }
     }
@@ -84,7 +83,6 @@ public function sincronizar(\Illuminate\Http\Request $request)
         return response()->json(['status' => 'info', 'message' => "No hay citas para sincronizar."]);
     }
 
-    // Si llegamos aquí, todo falló
     return response()->json([
         'status' => 'error', 
         'message' => "Error de Google: " . $ultimoError

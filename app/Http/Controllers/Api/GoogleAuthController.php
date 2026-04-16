@@ -34,18 +34,16 @@ class GoogleAuthController extends Controller
              $user->update(['foto' => $retrato]);
 
                 // 2. Guardamos en la ficha clínica (la que ve la psicóloga)
-                // Asumiendo que tienes la relación 'paciente' definida en tu modelo ExtraPaciente
                 if ($user->paciente) {
                $user->paciente->update(['imagen' => $retrato]);
                 }
             }
     
             if (!$user) {
-                // Si no existe, lo mandamos al login del CLIENTE (8002) con error
+                // Si no existe, lo mandamos al login del CLIENTE 
                 return redirect("http://cliente.umbrellastella.com/login?error=no_registrado");
             }
 
-            // Creamos el token de Sanctum (tu llave para el santuario)
             $token = $user->createToken('patient_token')->plainTextToken;
 
             $googleToken = $googleUser->token;

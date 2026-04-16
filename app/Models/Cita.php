@@ -8,7 +8,7 @@ class Cita extends Model
 {
     protected $table = 'citas';
     protected $primaryKey = 'id_citas';
-    public $timestamps = false; // Tu tabla no tiene created_at/updated_at
+    public $timestamps = false; 
 
     protected $fillable = [
         'fecha', 

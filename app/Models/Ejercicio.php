@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Ejercicio extends Model
 {
-    protected $table = 'ejercicios'; // Aseguraos que el nombre sea plural como en vuestro DB
+    protected $table = 'ejercicios'; 
     protected $primaryKey = 'id_ejercicios';
     public $timestamps = false;
 

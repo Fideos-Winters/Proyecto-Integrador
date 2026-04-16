@@ -20,7 +20,7 @@ public function index(Request $request)
                      ->orWhere('apellido', 'LIKE', "%{$buscar}%")
                      ->orWhere('correo', 'LIKE', "%{$buscar}%");
     })
-    ->get(); // Puedes cambiar a ->paginate(10) si la lista crece mucho
+    ->get(); 
 
     // Pasamos tanto los pacientes como el término para la persistencia en la vista
     return view('pacientes.index', compact('pacientes', 'buscar'));
@@ -36,8 +36,8 @@ public function index(Request $request)
     // Guardar en la base de datos
 public function store(Request $request)
 {
-    // 1. Validamos TODO primero. Si esto falla, regresa a la vista automáticamente.
-    $request->validate([
+    //validamos
+$request->validate([
         'nombre' => 'required|string|max:100',
         'apellido' => 'required|string|max:100',
         'usuario' => 'required|unique:extra_pacientes,usuario',
@@ -175,13 +175,12 @@ public function destroy($id)
 {
     $paciente = Paciente::findOrFail($id);
 
-    // Verificación de Expediente
+
     if ($paciente->expediente()->exists()) {
         return redirect()->route('pacientes.index')
             ->with('error', 'No se puede borrar: El paciente tiene un expediente clínico.');
     }
 
-    // NUEVA Verificación de Citas
     if ($paciente->citas()->exists()) {
         return redirect()->route('pacientes.index')
             ->with('error', 'No se puede borrar: El paciente tiene citas agendadas en el sistema.');
@@ -190,7 +189,7 @@ public function destroy($id)
     try {
         \DB::beginTransaction();
         
-        // Limpiar credenciales y fotos locales como hicimos antes...
+
         if ($paciente->extras) { $paciente->extras()->delete(); }
         
         if ($paciente->imagen && !\Str::startsWith($paciente->imagen, 'http')) {

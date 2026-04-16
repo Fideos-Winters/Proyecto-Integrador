@@ -7,8 +7,7 @@ class Notificacion extends Model
 {
     protected $table = 'notificaciones';
     protected $primaryKey = 'id_notificaciones';
-    public $timestamps = false; // Ya tienes fecha_envio manual
-
+    public $timestamps = false; 
     protected $fillable = [
         'tipo_notificacion',
         'medio_envio',       

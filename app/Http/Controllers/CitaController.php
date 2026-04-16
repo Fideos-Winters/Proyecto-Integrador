@@ -35,10 +35,7 @@ class CitaController extends Controller
         return view('citas.historial', compact('citas'));
     }
 
-    /**
-     * Muestra el formulario de creación.
-     * $fechaMin se usa en la vista: <input type="date" min="{{ $fechaMin }}">
-     */
+
     public function create()
     {
         $pacientes = Paciente::orderBy('nombre', 'asc')->get();
@@ -46,12 +43,7 @@ class CitaController extends Controller
         return view('citas.create', compact('pacientes', 'fechaMin'));
     }
 
-    /**
-     * Valida y guarda la nueva cita.
-     * Reglas:
-     *   1. La fecha no puede ser anterior a hoy.
-     *   2. No puede existir otra cita el mismo día a menos de 60 minutos de distancia.
-     */
+
     public function store(Request $request)
     {
         $request->validate([
@@ -151,19 +143,11 @@ class CitaController extends Controller
             ->with('success', 'La cita ha sido borrada del registro.');
     }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // MÉTODO PRIVADO
-    // ══════════════════════════════════════════════════════════════════════════
 
-    /**
-     * Busca si existe alguna cita el mismo día cuya hora esté
-     * a menos de 60 minutos de la hora solicitada.
-     *
-     * @param  string   $fecha      Fecha en formato Y-m-d
-     * @param  string   $hora       Hora en formato H:i
-     * @param  mixed    $excluirId  id_citas a ignorar (en update) o null (en store)
-     * @return Cita|null
-     */
+
+
+
+    //menu privado
     private function buscarConflictoHorario($fecha, $hora, $excluirId)
     {
         $horaCarbon = Carbon::parse("{$fecha} {$hora}");

@@ -23,16 +23,11 @@ class AuthController extends Controller
             ], 401);
         }       
 
-        // Revocar tokens anteriores para mantener el santuario limpio
         $psicologo->tokens()->delete();
 
         $token = $psicologo->createToken('auth_token')->plainTextToken;
 
-        /**
-         * Guardamos solo lo vital en la sesión.
-         * No guardamos 'foto_perfil' aquí para evitar que se quede obsoleta (caché).
-         * El Layout se encargará de traer la foto más reciente usando el 'id_psicologa'.
-         */
+     
         session([
             'id_psicologa' => $psicologo->id_psicologa,
             'usuario'      => $psicologo->usuario,
@@ -47,18 +42,16 @@ class AuthController extends Controller
             'usuario'      => $psicologo->usuario,
             'correo'       => $psicologo->correo,
             'id_psicologa' => $psicologo->id_psicologa,
-            'foto_perfil'  => $psicologo->url_imagen, // En el JSON de respuesta sí es útil enviarla
+            'foto_perfil'  => $psicologo->url_imagen, 
         ]);
     }
 
     public function logout(Request $request)
     {
-        // Borra el token de Sanctum (la llave de la API)
         if ($request->user()) {
             $request->user()->currentAccessToken()->delete();
         }
 
-        // Limpiar TODA la sesión del servidor para evitar fantasmas
         session()->flush();
         session()->invalidate();
         session()->regenerateToken();
@@ -68,13 +61,12 @@ class AuthController extends Controller
 
     public function me(Request $request)
     {
-        // Retornamos los datos frescos del usuario autenticado
         return response()->json($request->user());
     }
     
     public function guardarSesion(Request $request) {
     session([
-        'id_psicologa' => $request->id_psicologa, // ¡Sin esto no hay foto!
+        'id_psicologa' => $request->id_psicologa, 
         'usuario'      => $request->usuario,
         'token'        => $request->token,
     ]);

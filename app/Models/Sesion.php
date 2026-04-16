@@ -10,14 +10,13 @@ class Sesion extends Model
     protected $primaryKey = 'id_sesion';
     public $timestamps = false;
 
-    // ESTO ES LO QUE FALTA: La lista de campos permitidos
     protected $fillable = [
         'fecha', 
         'hora_inicio', 
         'hora_fin', 
         'id_expediente',
-        'id_notas',      // Aunque los usemos poco ahora, deben estar aquí
-        'id_ejercicios'  // para evitar futuros errores de este tipo
+        'id_notas',      
+        'id_ejercicios'  
     ];
 
     public function notas()

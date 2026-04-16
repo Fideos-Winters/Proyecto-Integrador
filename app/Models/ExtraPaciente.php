@@ -2,16 +2,14 @@
 
 namespace App\Models;
 
-// Cambiamos el "Model" base por "Authenticatable"
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens; // El trait sagrado para los tokens
-
+use Laravel\Sanctum\HasApiTokens; 
 class ExtraPaciente extends Authenticatable
 {
     use HasApiTokens, Notifiable;
 
-    protected $keyType = 'int'; // O 'string' si fuera un UUID
+    protected $keyType = 'int'; 
 public $incrementing = true;
 
 public function getKey()
@@ -29,9 +27,7 @@ public function getKey()
         'id_paciente'
     ];
 
-    /**
-     * IMPORTANTE: Laravel busca por defecto la columna 'password'.
-     */
+
     public function getAuthPassword()
     {
         return $this->contrasena;
